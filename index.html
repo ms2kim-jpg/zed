@@ -384,8 +384,8 @@ const DETAIL = {
 
 // ------------------------------------------------------------------ 공정
 const SECTIONS = [
-  { id: 'flow', group: '시작하기', num: '0', title: '업무 플로우', sub: '두 앱 · WEB · 시트', html: () => `
-    <div class="panel-head"><div><div class="badges">${W}${S}${V}${Y}</div><h2>업무 플로우</h2><p class="desc">업무 전 점검으로 시작해 현장 PDA(VISE 앱 + 양지 앱)에서 하차 · 검수 · 적치를 하고, 사무실에서 정산 리포트 · 작업 마감을 한 뒤 <b>18시 이후 다음날 데이터를 만들어 두고</b> 끝납니다.</p></div><div class="chip">영업일 기준 매일</div></div>
+  { id: 'flow', group: '시작하기', num: '0', title: '업무 전체 흐름', sub: 'VISE 앱 · 양지 앱 · WEB · 시트', html: () => `
+    <div class="panel-head"><div><div class="badges">${W}${S}${V}${Y}</div><h2>업무 전체 흐름</h2><p class="desc">업무 전 점검으로 시작해 현장 PDA(VISE 앱 + 양지 앱)에서 하차 · 검수 · 적치를 하고, 사무실에서 정산 리포트 · 작업 마감을 한 뒤 <b>18시 이후 다음날 데이터를 만들어 두고</b> 끝납니다.</p></div><div class="chip">영업일 기준 매일</div></div>
     <div class="lane-wrap"><table class="lane">
       <thead><tr><th class="sys"></th>${LANE_COLS.map((c, i) => `<th><span class="ln">${i + 1}</span>${c[0]}<small>${c[1]}</small></th>`).join('')}</tr></thead>
       <tbody>${LANE_ROWS.map((r) => `<tr class="${r[0]}"><th class="sys">${r[1]}</th>${r[2].map((t) => t ? `<td class="on"><div>${t}</div></td>` : '<td></td>').join('')}</tr>`).join('')}
