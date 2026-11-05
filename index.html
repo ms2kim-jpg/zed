@@ -227,6 +227,18 @@ td b{font-weight:800}
 .flow-step.web{background:var(--admin-bg);border-color:transparent}.flow-step.web .flow-who{color:var(--admin)}
 .flow-step.sheet{background:var(--sh-bg);border-color:transparent}.flow-step.sheet .flow-who{color:var(--sh)}
 .flow-step i{font-style:normal;display:inline-block;margin-top:6px;font-size:11px;font-weight:800;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 7px;background:var(--surface)}
+.lane-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;margin-top:4px}
+table.lane{min-width:860px;width:100%;border-collapse:collapse;table-layout:fixed;background:var(--surface)}
+table.lane th,table.lane td{border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:9px 7px;font-size:12px;line-height:1.5;vertical-align:top;text-align:left}
+table.lane thead th{background:var(--surface-2);font-size:13px;font-weight:800;color:var(--text)}
+table.lane thead th small{display:block;font-weight:600;color:var(--sub);font-size:11.5px}
+table.lane .ln{display:inline-block;min-width:18px;margin-right:4px;color:var(--sub);font-weight:700;font-variant-numeric:tabular-nums}
+table.lane th.sys{width:76px;border-left:0;background:var(--surface-2);font-weight:800;font-size:12.5px;color:var(--sub-2);white-space:nowrap}
+table.lane td.on div{border-left:3px solid var(--c);padding-left:6px;color:var(--text);font-weight:600}
+table.lane tr.w{--c:var(--admin)} table.lane tr.s{--c:#64748b} table.lane tr.v{--c:var(--v)} table.lane tr.y{--c:var(--brand)}
+table.lane tr.w th.sys{box-shadow:inset 3px 0 0 var(--admin)} table.lane tr.s th.sys{box-shadow:inset 3px 0 0 #64748b} table.lane tr.v th.sys{box-shadow:inset 3px 0 0 var(--v)} table.lane tr.y th.sys{box-shadow:inset 3px 0 0 var(--brand)}
+table.lane tr.st td{background:var(--surface-2);color:var(--sub);font-size:12px;font-weight:600}
+table.lane tr:last-child td,table.lane tr:last-child th{border-bottom:0}
 .legend{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
 .mark-key{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--sub);margin:10px 0 2px}
 .mark-key b.r{color:#dc2626}.mark-key b.y{color:#d97706}
@@ -280,6 +292,14 @@ const steps = (list) => `<div class="steps">${list.map((s, i) => `<div class="st
 const sec = (t, small) => `<div class="sec-title">${t}${small ? ` <small>${small}</small>` : ''}</div>`;
 const markKey = '<div class="mark-key"><span><b class="r">■ 빨간 테두리</b> 꼭 눌러야 하는 버튼</span><span><b class="y">■ 노란 테두리</b> 입력·확인하는 칸</span><span>① ② … 누르는 순서</span><span>사진을 누르면 크게 보입니다</span></div>';
 
+const LANE_COLS = [['입고 확인', '아침'], ['검수 목록 생성', '아침'], ['하차', '도착'], ['검수', '하차 후'], ['과금', '검수 중'], ['적치', '검수 후'], ['입고 완료', 'SKU 검수 끝'], ['정산 리포트', '비용 발생 건'], ['작업 마감', '작업 종료']];
+const LANE_ROWS = [
+  ['w', 'vise WEB', ['등록됨 → 입고 확인', '', '', '', '', '', '', '정산 정보 입력 · 저장 · 정산 정보 전송', '']],
+  ['s', '입고 시트', ['', '① 가져오기<br>② 시트 만들기', '', '', '', '', '', '[과금] 탭으로 내역 확인', '작업 마감 · 백업']],
+  ['v', 'vise 앱', ['', '', '회차 정보<br>차량번호 · 도착 사진', '검수 수량 · 입수량 · 체적', '실셈 수량', '', '입고 완료', '', '']],
+  ['y', '양지 앱', ['', '', '하차 시작 · 완료<br>톤수 · 대수', '검수완료<br>PLT 라벨 부착', '실셈 외 과금 · 사진', '로케이션 · 사진', '작업 내역 확인', '', '']]
+];
+const LANE_ST = ['등록됨 → 확인됨', '확인됨', '확인됨 → 입고중', '입고중', '입고중', '입고중', '입고중 → 승인대기', '승인대기', '—'];
 // ------------------------------------------------------------------ 상세보기
 const DETAIL = {
   vmain: { t: 'vise 앱 · 입고 화면', s: 'PDA 에서 vise 앱의 입고 메뉴를 엽니다.', b: [
@@ -358,17 +378,12 @@ const DETAIL = {
 const SECTIONS = [
   { id: 'flow', group: '시작하기', num: '0', title: '하루 업무 흐름', sub: '두 앱 · WEB · 시트', html: () => `
     <div class="panel-head"><div><div class="badges">${W}${S}${V}${Y}</div><h2>하루 업무 흐름</h2><p class="desc">입고 하루는 <b>vise WEB → 입고 시트 → 현장 PDA(vise 앱 + 양지 앱) → vise WEB → 입고 시트</b> 순서로 흘러갑니다. 현장에서는 두 앱을 같이 씁니다.</p></div><div class="chip">영업일 기준 매일</div></div>
-    <div class="flow lane">
-      <div class="flow-step web"><div class="flow-who">🖥️ vise WEB</div><b>입고 확인</b><span>등록됨 → 확인됨</span><i>아침 · 관리자</i></div>
-      <div class="flow-step sheet"><div class="flow-who">📄 입고 시트</div><b>① 가져오기 · ② 만들기</b><span>확인됨 → 양지 앱 검수 목록</span><i>아침 · 관리자</i></div>
-      <div class="flow-step vise"><div class="flow-who">📱 vise 앱 + 양지 앱</div><b>하차</b><span>회차 정보 · 하차 기록</span><i>확인됨 → 입고중</i></div>
-      <div class="flow-step vise"><div class="flow-who">📱 vise 앱 + 양지 앱</div><b>검수 · 과금</b><span>수량 · 실셈 · PLT 라벨</span><i>입고중</i></div>
-      <div class="flow-step yj"><div class="flow-who">📱 양지 앱</div><b>적치</b><span>PLT → 로케이션 → 사진</span><i>현장</i></div>
-      <div class="flow-step vise"><div class="flow-who">📱 vise 앱</div><b>입고 완료</b><span>모든 SKU 검수 후</span><i>입고중 → 승인대기</i></div>
-      <div class="flow-step web"><div class="flow-who">🖥️ vise WEB</div><b>정산 리포트</b><span>비용 발생 건만 · 저장 → 전송</span><i>승인대기 · 관리자</i></div>
-      <div class="flow-step sheet"><div class="flow-who">📄 입고 시트</div><b>작업 마감</b><span>백업 · 대시보드 · 비우기</span><i>작업 후 · 관리자</i></div>
-    </div>
-    ${sec('🧭 vise 입고 상태와 할 일')}
+    <div class="lane-wrap"><table class="lane">
+      <thead><tr><th class="sys"></th>${LANE_COLS.map((c, i) => `<th><span class="ln">${i + 1}</span>${c[0]}<small>${c[1]}</small></th>`).join('')}</tr></thead>
+      <tbody>${LANE_ROWS.map((r) => `<tr class="${r[0]}"><th class="sys">${r[1]}</th>${r[2].map((t) => t ? `<td class="on"><div>${t}</div></td>` : '<td></td>').join('')}</tr>`).join('')}
+      <tr class="st"><th class="sys">vise 상태</th>${LANE_ST.map((t) => `<td>${t}</td>`).join('')}</tr></tbody>
+    </table></div>
+    ${sec('vise 입고 상태별 할 일')}
     ${tbl(['vise 상태', '어디서', '하는 일'], [
       ['<span class="tag">등록됨</span>', '🖥️ vise WEB', '입고 요청 확인 → <b>입고 확인</b>'],
       ['<span class="tag b">확인됨</span>', '📱 vise 앱', '회차 정보 입력 (하차)'],
