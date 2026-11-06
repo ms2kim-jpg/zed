@@ -288,7 +288,7 @@ const shots = (...xs) => `<div class="shots">${xs.map((x) => shot(x[0], x[1])).j
 const note = (kind, t, items) => `<div class="note ${kind}"><b class="t">${t}</b>${Array.isArray(items) ? '<ul>' + items.map((x) => `<li>${x}</li>`).join('') + '</ul>' : items}</div>`;
 const tbl = (head, rows) => `<div class="tbl-wrap"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 // [제목, 설명, 상세 키, 앱(v/y/w/s)]
-const steps = (list) => `<div class="steps">${list.map((s, i) => `<div class="step"><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}</div></div>${s[2] ? `<button class="detail-btn" data-detail="${s[2]}">상세</button>` : ''}</div>`).join('')}</div>`;
+const steps = (list) => `<div class="steps">${list.map((s, i) => `<div class="step"><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}</div></div>${s[2] ? `<button class="detail-btn" data-detail="${s[2]}">자세히</button>` : ''}</div>`).join('')}</div>`;
 const sec = (t, small) => `<div class="sec-title">${t}${small ? ` <small>${small}</small>` : ''}</div>`;
 const markKey = '<div class="mark-key"><span><b class="r">■ 빨간 테두리</b> 꼭 눌러야 하는 버튼 · ✕ 는 누르면 안 되는 버튼</span><span><b class="y">■ 노란 테두리</b> 입력·확인하는 칸</span><span>① ② … 누르는 순서</span><span>사진을 누르면 크게 보입니다</span></div>';
 
@@ -310,7 +310,7 @@ const DETAIL = {
     ['🖨️ 라벨', '<p>VISE 에서는 라벨이 출력되지 않습니다 (향후 회사 시스템 개발 후 사용 예정). PLT 라벨은 <b>양지 앱</b>에서 출력합니다.</p>'] ] },
   vunload: { t: 'VISE 앱 · 회차 정보 입력 (하차)', s: '확인됨 탭에서 고객사 이름으로 입고 건을 찾고 → 회차 목록에서 회차를 눌러 입력합니다.', b: [
     ['🚚 차량 (PLT)', '<ol><li><b>PLT 수량</b>을 넣습니다. 박스로 왔으면 <b>⇋ BOX로 변경</b>을 누르고 박스 수를 넣습니다.</li><li><b>(필수) 차량 번호</b>를 넣습니다.</li><li><b>도착 이미지</b> ＋ 를 눌러 찍습니다. <b>차량 번호판</b>과 <b>차량에 실린 PLT·박스가 모두</b> 보이게 찍어야 합니다.</li><li>저장하면 입고 건이 <b>입고중</b>으로 넘어가 검수할 수 있습니다.</li></ol>'],
-    ['📦 택배', '<p>택배는 회차가 여러 개로 나뉘어 있습니다. 송장 번호에 맞는 회차에 입력합니다. → 택배 상세 참고</p>'] ] },
+    ['📦 택배', '<p>택배는 회차가 여러 개로 나뉘어 있습니다. 송장 번호에 맞는 회차에 입력합니다. → 택배 자세히 참고</p>'] ] },
   vparcel: { t: 'VISE 앱 · 택배 회차 정보 입력', s: '차량과 비슷한 화면이지만 회차가 여러 개이고, 송장 번호를 확인해야 합니다.', b: [
     ['📦 순서', '<ol><li>확인됨 탭에서 <b>고객사 이름</b>으로 입고 건을 찾습니다.</li><li>회차 목록(1회차, 2회차…)에서 <b>실물 송장 번호와 맞는 회차</b>를 엽니다. 회차마다 고객사가 기입한 송장 번호가 있습니다.</li><li><b>BOX 수량</b>(− / +), <b>(필수) 택배사명</b>, <b>(필수) 송장 번호</b>를 확인 · 입력합니다.</li><li><b>도착 이미지</b>에 <b>송장 번호가 보이게</b> 찍습니다.</li><li>다른 송장도 같은 방법으로 회차마다 반복합니다.</li></ol>'],
     ['⚠️ 주의', '<ul><li>송장 번호와 <b>다른 회차</b>에 사진을 넣지 않게 꼭 대조하세요.</li><li>고객사가 적은 송장 번호와 실물이 다르면 관리자에게 알립니다.</li></ul>'] ] },
@@ -399,7 +399,7 @@ const SECTIONS = [
       ['<span class="tag o">입고중</span>', '📱 VISE 앱 + 양지 앱', '검수 · 과금(실셈) · 적치 → VISE 앱 <b>입고 완료</b>'],
       ['<span class="tag r">승인대기</span>', '🖥️ VISE WEB', '비용 발생 건 <b>정산 리포트</b> (저장 → 정산 정보 전송)'],
       ['<span class="tag g">입고 완료</span>', '-', '끝']])}
-    ${note('info', '💡 이 가이드 보는 법', ['<span class="pill v">VISE 앱</span><span class="pill y">양지 앱</span><span class="pill w">VISE WEB</span><span class="pill s">입고 시트</span> 표시로 어디서 하는 일인지 구분합니다.', '현장 직원은 <b>📱 현장 PDA</b> 공정만, 관리자는 <b>🖥️ 사무실</b> 공정까지 봅니다.', '항목의 <b>상세</b>, 화면 사진을 누르면 크게 볼 수 있습니다.'])}` },
+    ${note('info', '💡 이 가이드 보는 법', ['<span class="pill v">VISE 앱</span><span class="pill y">양지 앱</span><span class="pill w">VISE WEB</span><span class="pill s">입고 시트</span> 표시로 어디서 하는 일인지 구분합니다.', '현장 직원은 <b>📱 현장 PDA</b> 공정만, 관리자는 <b>🖥️ 사무실</b> 공정까지 봅니다.', '항목의 <b>자세히</b>, 화면 사진을 누르면 크게 볼 수 있습니다.'])}` },
 
   { id: 'where', group: '시작하기', num: 'A', title: '어느 앱에서?', sub: '작업별 한눈 표', html: () => `
     <div class="panel-head"><div><div class="badges">${V}${Y}${W}${S}</div><h2>어느 앱에서?</h2><p class="desc">헷갈릴 때 이 표를 보세요. 같은 일을 두 앱에 모두 해야 하는 칸은 ✅ 가 두 개입니다.</p></div></div>
