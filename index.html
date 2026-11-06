@@ -202,7 +202,7 @@ td b{font-weight:800}
 <body>
 
 <style>
-/* 앱 구분 색: VISE 앱(초록) · 양지 앱(파랑) · VISE WEB(보라) · 입고 시트(회색) */
+/* 앱 구분 색: VISE 앱(파랑) · 양지 앱(초록) · VISE WEB(보라) · 입고 시트(회색) */
 :root{--v:#0f7b4f;--v-bg:#e8f7ef;--sh:#475569;--sh-bg:#eef2f6}
 .badge.vs{background:var(--v-bg);color:var(--v)}
 .badge.yj{background:var(--brand-soft);color:var(--brand)}
@@ -319,6 +319,14 @@ th{background:var(--surface-2)}
 .faq-item{border-color:var(--line)}
 .modal-dialog{border-radius:26px}
 .m-sec{border-color:var(--line)}
+/* 앱 구분 색 바꿈: VISE 앱 = 파랑 · 양지 앱 = 초록 */
+:root{--v:#0040d1;--v-bg:#eef4ff;--y:#0f7b4f;--y-bg:#e8f7ef}
+.badge.yj,.pill.y{background:var(--y-bg);color:var(--y)}
+.step-copy .pill.y{color:var(--y)}
+.step-no{background:var(--y-bg);color:var(--y)}
+.flow-step.yj{background:var(--y-bg)}.flow-step.yj .flow-who{color:var(--y)}
+table.lane tr.y{--c:var(--y)} table.lane tr.y th.sys{box-shadow:inset 3px 0 0 var(--y)}
+.hero .legend .badge.vs,.hero .legend .badge.yj{color:#EDE9E1}
 @media (max-width:900px){.hero-eyebrow{letter-spacing:.1em;font-size:11px}.hero{padding:28px 22px 24px;border-radius:22px}.hero h1{font-size:27px}.panel{padding:22px 18px}.panel h2{font-size:23px;gap:10px}.sec-no{width:38px;height:38px;font-size:13px;border-radius:11px}}
 </style>
 <div class="mobile-top">
