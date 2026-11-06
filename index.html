@@ -266,7 +266,7 @@ body{background:var(--bg)}
 .logo-mark{background:linear-gradient(135deg,var(--brass-2),var(--brass));color:var(--ink);border-radius:11px;box-shadow:0 6px 18px rgba(198,161,91,.25)}
 .logo-text strong{color:#fff;letter-spacing:-.01em}
 .logo-text span{color:#8F8B82}
-.nav-group{color:var(--brass);font-size:11px;font-weight:800;letter-spacing:.16em;margin:22px 10px 8px;text-transform:uppercase;opacity:.95}
+.nav-group{color:#9C978C;font-size:13px;font-weight:800;letter-spacing:0;margin:22px 10px 8px}
 .nav-list{gap:2px}
 .nav-btn{background:transparent;border:1px solid transparent;color:#CFCBC2;padding:9px 10px;border-radius:12px}
 .nav-btn:hover{background:rgba(255,255,255,.05);border-color:transparent;color:#fff}
@@ -643,13 +643,11 @@ const SECTIONS = [
 
 const HOME = () => `
   <section class="hero">
-    <div class="hero-eyebrow">Yangji B2F · Inbound Operations Guide</div>
     <h1>양지센터 B2F 입고 가이드</h1>
     <p class="lead">현장에서는 <b>VISE 앱</b>과 <b>양지 입고 앱</b>을 같이 씁니다. 두 앱과 VISE WEB · 입고 시트를 공정 순서대로 묶어 정리한 poomgo 입고 파트 실무 가이드입니다.</p>
     <div class="legend"><span class="badge vs">📱 VISE 앱</span><span class="badge yj">📱 양지 앱</span><span class="badge web">🖥️ VISE WEB</span><span class="badge sheet">📄 입고 시트</span></div>
   </section>
   <section class="panel home-body">
-    <div class="sec-eyebrow">Before you start</div>
     <h2><span class="sec-no">!</span>작업 전 반드시 확인해주세요</h2>
     <p class="desc" style="margin-bottom:18px">현장 작업 전에 아래 여섯 가지를 먼저 확인합니다.</p>
     <ul class="rule-list">
@@ -687,8 +685,6 @@ function render(){
   if (s) {                                         // 공정 번호 배지 + 구역 이름
     const h2 = view.querySelector('.panel-head h2');
     if (h2) h2.insertAdjacentHTML('afterbegin', `<span class="sec-no">${/^\d+$/.test(s.num) ? String(s.num).padStart(2, '0') : s.num}</span>`);
-    const hd = view.querySelector('.panel-head > div');
-    if (hd) hd.insertAdjacentHTML('afterbegin', `<div class="sec-eyebrow">${String(s.group).replace(/^[^\s가-힣A-Za-z]+\s*/, '')}</div>`);
   }
   document.getElementById('navDesk').innerHTML = navHtml(s ? s.id : '');
   document.getElementById('navMobile').innerHTML = navHtml(s ? s.id : '');
