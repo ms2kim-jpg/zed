@@ -249,6 +249,78 @@ table.lane tr:last-child td,table.lane tr:last-child th{border-bottom:0}
 @media (max-width:640px){.flow.lane{grid-template-columns:1fr 1fr}}
 </style>
 
+
+<style>
+/* ===== 테마: Ink & Brass (고급 다크 사이드바 · 다크 히어로 · 브라스 포인트) ===== */
+:root{
+  --ink:#16181D; --ink-2:#1F2229; --ink-3:#2C3038; --ink-line:rgba(255,255,255,.08);
+  --brass:#C6A15B; --brass-2:#E3CB93; --brass-d:#8A6A2B; --brass-soft:#F5EEDF; --brass-line:#E8DCC3;
+  --bg:#F6F4EF; --line:#E8E3D9; --surface-2:#FBF9F5; --side:var(--ink);
+  --shadow:0 18px 40px rgba(22,24,29,.07); --shadow-sm:0 2px 10px rgba(22,24,29,.04);
+}
+body{background:var(--bg)}
+/* 사이드바 */
+.sidebar{background:var(--ink);border-right:0;color:#E8E5DE;padding:26px 14px}
+.sidebar::-webkit-scrollbar{width:8px}.sidebar::-webkit-scrollbar-thumb{background:var(--ink-3);border-radius:8px}
+.logo{padding:0 6px 18px;margin-bottom:6px;border-bottom:1px solid var(--ink-line)}
+.logo-mark{background:linear-gradient(135deg,var(--brass-2),var(--brass));color:var(--ink);border-radius:11px;box-shadow:0 6px 18px rgba(198,161,91,.25)}
+.logo-text strong{color:#fff;letter-spacing:-.01em}
+.logo-text span{color:#8F8B82}
+.nav-group{color:var(--brass);font-size:11px;font-weight:800;letter-spacing:.16em;margin:22px 10px 8px;text-transform:uppercase;opacity:.95}
+.nav-list{gap:2px}
+.nav-btn{background:transparent;border:1px solid transparent;color:#CFCBC2;padding:9px 10px;border-radius:12px}
+.nav-btn:hover{background:rgba(255,255,255,.05);border-color:transparent;color:#fff}
+.nav-btn.active{background:linear-gradient(90deg,rgba(198,161,91,.20),rgba(198,161,91,.05));border-color:rgba(198,161,91,.38);color:#fff;box-shadow:none}
+.nav-num{background:rgba(255,255,255,.06);color:#B9B3A6;border-radius:8px;font-size:12px;width:28px;height:28px}
+.nav-btn.active .nav-num{background:var(--brass);color:var(--ink)}
+.nav-copy strong{font-weight:700}
+.nav-copy span{opacity:.55}
+/* 폰 위쪽 · 서랍 */
+.mobile-top{background:color-mix(in srgb,var(--ink) 94%,transparent);border-bottom:1px solid var(--ink-line);color:#fff}
+body::before{background:var(--ink)}
+.mobile-top .logo{border:0;padding:0}
+.mobile-menu{background:var(--ink-2);border-color:var(--ink-3);color:var(--brass)}
+.drawer{background:var(--ink);color:#E8E5DE}
+.drawer-head strong{color:#fff}
+.drawer .icon-btn{background:var(--ink-2);border-color:var(--ink-3);color:#fff}
+/* 첫 화면 히어로 */
+.hero{background:radial-gradient(900px 340px at 92% -10%,rgba(198,161,91,.26),transparent 62%),linear-gradient(135deg,#15171C 0%,#1F2229 55%,#2A2721 100%);border:0;color:#fff;border-radius:28px;padding:42px 40px 36px;box-shadow:0 24px 60px rgba(22,24,29,.22)}
+.hero-eyebrow{background:none;padding:0;color:var(--brass);font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px}
+.hero h1{color:#fff;font-size:38px;letter-spacing:-.035em;margin-bottom:12px}
+.hero .lead{color:#CBC6BB;font-size:16px;max-width:760px}
+.hero .lead b{color:#fff}
+.hero .legend{margin-top:18px}
+.hero .legend .badge{background:rgba(255,255,255,.07);color:#EDE9E1;border:1px solid rgba(255,255,255,.14);padding:8px 13px}
+.home-body{margin-top:22px}
+.home-body .rule-list li{border-color:var(--line);background:#fff}
+.rule-dot{background:var(--brass-soft);color:var(--brass-d)}
+.quick-card{border-color:var(--line);background:#fff}
+.quick-card:hover{border-color:var(--brass);background:var(--surface-2);box-shadow:0 8px 22px rgba(198,161,91,.12)}
+.quick-card b{letter-spacing:-.01em}
+/* 공정 화면 */
+.panel{border-color:var(--line);border-radius:28px;padding:30px 30px 26px}
+.sec-eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--brass-d);margin-bottom:10px}
+.panel h2{display:flex;align-items:center;gap:14px;font-size:30px;letter-spacing:-.035em}
+.sec-no{flex:0 0 auto;width:46px;height:46px;border-radius:13px;background:var(--ink);color:var(--brass);display:grid;place-items:center;font-size:15px;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums;box-shadow:0 8px 18px rgba(22,24,29,.18)}
+.panel .desc{margin-top:4px}
+.chip{background:var(--brass-soft);border-color:var(--brass-line);color:var(--brass-d)}
+.sec-title{letter-spacing:-.02em}
+.sec-title::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--brass);margin-right:2px}
+.step{border-color:var(--line)}
+.step:hover{border-color:var(--brass-line)}
+.detail-btn{border-color:var(--line);color:var(--ink);background:#fff}
+.detail-btn:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.tbl-wrap,.lane-wrap{border-color:var(--line)}
+th{background:var(--surface-2)}
+.shot{background:var(--surface-2);border-color:var(--line)}
+.pager{border-top-color:var(--line)}
+.pager button{border-color:var(--line)}
+.pager button:hover{border-color:var(--brass);background:var(--surface-2)}
+.faq-item{border-color:var(--line)}
+.modal-dialog{border-radius:26px}
+.m-sec{border-color:var(--line)}
+@media (max-width:900px){.hero-eyebrow{letter-spacing:.1em;font-size:11px}.hero{padding:28px 22px 24px;border-radius:22px}.hero h1{font-size:27px}.panel{padding:22px 18px}.panel h2{font-size:23px;gap:10px}.sec-no{width:38px;height:38px;font-size:13px;border-radius:11px}}
+</style>
 <div class="mobile-top">
   <div class="mobile-top-inner">
     <div class="logo" data-go="home" style="margin:0"><div class="logo-mark">B2F</div><div class="logo-text"><strong>양지센터 B2F 입고 가이드</strong></div></div>
@@ -582,9 +654,15 @@ const SECTIONS = [
 
 const HOME = () => `
   <section class="hero">
-    <div class="hero-eyebrow">📦 양지센터 B2F · 입고 파트 · poomgo</div>
-    <h1>작업 전 반드시 확인해주세요!</h1>
-    <p class="lead">현장에서는 <b>VISE 앱</b>과 <b>양지 입고 앱</b>을 같이 씁니다. 이 가이드는 두 앱과 VISE WEB · 입고 시트를 공정 순서대로 묶어 정리했습니다.</p>
+    <div class="hero-eyebrow">Yangji B2F · Inbound Operations Guide</div>
+    <h1>양지센터 B2F 입고 가이드</h1>
+    <p class="lead">현장에서는 <b>VISE 앱</b>과 <b>양지 입고 앱</b>을 같이 씁니다. 두 앱과 VISE WEB · 입고 시트를 공정 순서대로 묶어 정리한 poomgo 입고 파트 실무 가이드입니다.</p>
+    <div class="legend"><span class="badge vs">📱 VISE 앱</span><span class="badge yj">📱 양지 앱</span><span class="badge web">🖥️ VISE WEB</span><span class="badge sheet">📄 입고 시트</span></div>
+  </section>
+  <section class="panel home-body">
+    <div class="sec-eyebrow">Before you start</div>
+    <h2><span class="sec-no">!</span>작업 전 반드시 확인해주세요</h2>
+    <p class="desc" style="margin-bottom:18px">현장 작업 전에 아래 여섯 가지를 먼저 확인합니다.</p>
     <ul class="rule-list">
       <li><div class="rule-dot">1</div><div class="rule-copy"><strong>로그인: VISE 앱은 사원증, 양지 앱은 개인 계정</strong><span>검수자 · 적치자가 이름으로 남습니다.</span></div></li>
       <li><div class="rule-dot">2</div><div class="rule-copy"><strong>하차: 두 앱 모두 기록</strong><span>VISE 앱 회차 정보(차량번호 · 도착 사진) + 양지 앱 입고 시작(톤수 · 하차 시간)</span></div></li>
@@ -593,7 +671,6 @@ const HOME = () => `
       <li><div class="rule-dot">5</div><div class="rule-copy"><strong>적치 사진 필수 · 정물일치</strong><span>한 로케이션에는 한 SKU. 등록된 로케이션에만 적치됩니다.</span></div></li>
       <li><div class="rule-dot">6</div><div class="rule-copy"><strong>정산 리포트는 저장 → 전송까지</strong><span>비용 발생 건은 정산 정보 전송을 눌러야 끝납니다.</span></div></li>
     </ul>
-    <div class="legend"><span class="badge vs">📱 VISE 앱</span><span class="badge yj">📱 양지 앱</span><span class="badge web">🖥️ VISE WEB</span><span class="badge sheet">📄 입고 시트</span></div>
     <div class="quick"><h3>공정 바로가기</h3><div class="quick-grid">
       ${SECTIONS.map((s) => `<button class="quick-card" data-go="${s.id}"><b>${/^\d+$/.test(s.num) ? s.num + '. ' : ''}${s.title}</b><span>${s.sub}</span></button>`).join('')}
     </div></div>
@@ -617,6 +694,12 @@ function render(){
   else {
     const prev = SECTIONS[i - 1], next = SECTIONS[i + 1];
     view.innerHTML = `<section class="panel">${s.html()}<div class="pager">${prev ? `<button data-go="${prev.id}"><small>‹ 이전</small>${prev.title}</button>` : `<button data-go="home"><small>‹ 처음</small>작업 전 확인사항</button>`}${next ? `<button class="next" data-go="${next.id}"><small>다음 ›</small>${next.title}</button>` : ''}</div></section>`;
+  }
+  if (s) {                                         // 공정 번호 배지 + 구역 이름
+    const h2 = view.querySelector('.panel-head h2');
+    if (h2) h2.insertAdjacentHTML('afterbegin', `<span class="sec-no">${/^\d+$/.test(s.num) ? String(s.num).padStart(2, '0') : s.num}</span>`);
+    const hd = view.querySelector('.panel-head > div');
+    if (hd) hd.insertAdjacentHTML('afterbegin', `<div class="sec-eyebrow">${String(s.group).replace(/^[^\s가-힣A-Za-z]+\s*/, '')}</div>`);
   }
   document.getElementById('navDesk').innerHTML = navHtml(s ? s.id : '');
   document.getElementById('navMobile').innerHTML = navHtml(s ? s.id : '');
