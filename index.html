@@ -480,6 +480,14 @@ const SECTIONS = [
         ['바코드 부착 · 가림', '<span class="pill y">양지 앱</span> + 사진', '관리자가 추가'],
         ['긴급 입고 · 회송 · 폐기 · 기타', '<span class="pill y">양지 앱</span> + 사진', '관리자가 추가']])}
           ${note('warn', '⏱️ VISE 앱에 실셈을 못 넣고 입고 처리됐다면', '<b>양지 앱 과금</b>에서 실셈을 입력할 수 있습니다. 승인대기 때 관리자가 WEB 정산 정보에 넣습니다.')}
+      ${sec('📌 언제 과금하나요', '항목별 청구 기준')}
+      ${tbl(['항목', '이럴 때 과금', '단위'], [
+        ['<b style="white-space:nowrap">실셈</b>', '<b>잔량</b> 박스 · <b>벌크</b> 입고로 수량을 직접 세야 할 때', '개'],
+        ['<b style="white-space:nowrap">바코드 가림</b>', 'SKU 바코드가 <b>카톤 외부</b>에 있을 때 가림 처리 (카톤째 출고되는 것 방지)', '개'],
+        ['<b style="white-space:nowrap">바코드 부착</b>', '제품에 바코드가 <b>없거나 · 등록 바코드와 다를 때</b><br><span style="color:var(--warn)">⚠️ 고객사와 소통한 뒤 진행</span>', '개'],
+        ['<b style="white-space:nowrap">긴급입고</b>', '요청서 <b>작성일자 미준수</b> 건<br><b>과입고</b>된 재고 <span style="color:var(--warn)">(고객사와 소통 후 요청서 작성)</span>', '개'],
+        ['<b style="white-space:nowrap">혼적 분리</b>', '1 PLT 에 <b>3 SKU 까지는 비용 없음</b> · <b>4 SKU 부터</b> 분리 비용 청구', '박스']])}
+      ${note('info', '💡 단가는 입고 시트 [과금단가] 탭 기준', '양지 앱에서 항목별 수량만 넣으면 금액은 단가표대로 계산됩니다. 바코드 부착 · 긴급입고는 <b>고객사와 먼저 소통</b>한 뒤 진행하고 기록하세요.')}
     </div>${shots(['v-charge', 'VISE 앱 · 과금 내역 입력 (실셈)'], ['detail', '양지 앱 · 💰 과금 입력'])}</div>` },
 
   { id: 'put', group: '📱 현장 PDA', num: '5', title: '적치', sub: 'PLT → 로케이션 → 사진', html: () => `
