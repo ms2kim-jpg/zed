@@ -375,9 +375,9 @@ body::before{background:#fff}
 .det-shots .shot{position:static;padding:8px;border-radius:16px}
 .det-shots .shot figcaption{font-size:12px;margin:6px 2px 0}
 @media (max-width:640px){.det-shots{grid-template-columns:repeat(2,minmax(0,1fr))}.det-shots.n1{grid-template-columns:minmax(0,1fr);max-width:280px}.det-shots.wide{grid-template-columns:minmax(0,1fr)}}
-.toc-chip.on{background:#4F5BD5;border-color:#4F5BD5;color:#fff}.toc-chip.on::after{content:" ▴"}
 .toc-chip{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--sub-2);line-height:1.6;text-align:left}
 .toc-chip:hover{border-color:#4F5BD5;color:#2B2F6B;background:#EEF0FD}
+.step .toc-chip.on,.step .toc-chip.on:hover{background:#4F5BD5;border-color:#4F5BD5;color:#fff}.toc-chip.on::after{content:" ▴"}
 .detail-btn i{font-style:normal;font-size:11px;margin-left:2px}
 .step.open .detail-btn{background:#EEF0FD;border-color:#C9CEF6}
 .step-det{grid-column:1/-1;min-width:0;border-top:1px dashed var(--line);padding-top:6px;margin-top:2px}
@@ -826,13 +826,17 @@ function openDetail(k){
 }
 // 단계 카드 안에서 자세히 펼치기 / 접기
 function toggleStep(step, open, part){
-  const k = step.dataset.key, d = DETAIL[k], det = step.querySelector('.step-det'), btn = step.querySelector('.detail-btn');
+  const k = step.dataset.key, d = DETAIL[k], det = step.querySelector('.step-det');
   if (!d || !det) return;
   if (open === undefined) open = det.hidden;
-  if (open && !det.innerHTML) det.innerHTML = `<p class="det-sub">${d.s}</p>${detailBlocks(d, k)}<button class="det-close" data-fold>접기 ▴</button>`;
-  det.hidden = !open; step.classList.toggle('open', open); if (!open) step.querySelectorAll('.toc-chip.on').forEach((c) => c.classList.remove('on'));
-  if (btn) { btn.setAttribute('aria-expanded', open); btn.innerHTML = open ? '접기 <i>▴</i>' : '자세히 <i>▾</i>'; }
-  if (open && part != null) { const t = det.querySelector(`[data-part="${part}"]`); if (t) { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); flash(t); } }
+  if (open && !det.innerHTML) det.innerHTML = `${detailBlocks(d, k)}<button class="det-close" data-fold>접기 ▴</button>`;
+  if (open) {                                       // 한 번에 하위 탭 하나만
+    part = part == null ? '0' : String(part);
+    det.querySelectorAll('.m-sec').forEach((m) => { m.hidden = m.dataset.part !== part; });
+    step.querySelectorAll('.toc-chip').forEach((c) => c.classList.toggle('on', c.dataset.part === part));
+  } else step.querySelectorAll('.toc-chip.on').forEach((c) => c.classList.remove('on'));
+  det.hidden = !open; step.classList.toggle('open', open);
+  if (open) { const t = det.querySelector(`[data-part="${part}"]`); if (t && t.getBoundingClientRect().top > innerHeight - 120) t.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
 }
 function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
 
@@ -856,7 +860,7 @@ function buildIndex(){
       add({ sec: s.id, secName: secName(s), kind: 'step', i, title: title.trim(), text: title + ' · ' + sub, rank: 0 });
       if (d) {
         add({ sec: s.id, secName: secName(s), kind: 'step', i, title: title.trim(), text: d.t + ' · ' + d.s, rank: 1 });
-        d.b.forEach((b, j) => add({ sec: s.id, secName: secName(s), kind: 'step', i, k, part: j, title: title.trim() + ' › ' + b[0], text: textOf(b[1]), rank: 2 }));
+        d.b.forEach((b, j) => add({ sec: s.id, secName: secName(s), kind: 'step', i, k, part: j, title: title.trim() + ' › ' + b[0], text: b[0] + ' · ' + textOf(b[1]), rank: 2 }));
       }
     });
     c.querySelectorAll(BLOCK_SEL).forEach((el, i) => {
@@ -910,7 +914,7 @@ function openHit(o, raw){ closeSearch(); PENDING = { o, raw }; go(o.sec); }
 function applyHit(o, raw){
   {
     const view = document.getElementById('view'); let el = null;
-    if (o.kind === 'step') { el = view.querySelectorAll('.step')[o.i]; if (el && el.dataset.key) toggleStep(el, true); }
+    if (o.kind === 'step') { el = view.querySelectorAll('.step')[o.i]; if (el && el.dataset.key) toggleStep(el, true, o.part != null ? o.part : 0); }
     else if (o.kind === 'block') { el = [...view.querySelectorAll(BLOCK_SEL)].filter((x) => !x.closest('.step'))[o.i]; const f = el && el.closest('.faq-item'); if (f && !f.classList.contains('open')) f.querySelector('.faq-q').click(); }
     if (!el) return;
     markIn(el, raw);
@@ -929,9 +933,8 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-close-search]')) { closeSearch(); return; }
   const fold = e.target.closest('[data-fold]'); if (fold) { const st = fold.closest('.step'); toggleStep(st, false); st.scrollIntoView({ block: 'nearest' }); return; }
   const d = e.target.closest('[data-detail]'); if (d) { const st = d.closest('.step[data-key]'); if (st) { const part = d.dataset.part;
-      if (part != null && st.classList.contains('open') && d.classList.contains('on')) { toggleStep(st, false); return; }
-      toggleStep(st, part != null ? true : undefined, part != null ? part : null);
-      st.querySelectorAll('.toc-chip').forEach((c) => c.classList.toggle('on', c === d && st.classList.contains('open'))); } else openDetail(d.dataset.detail); return; }
+      if (st.classList.contains('open') && d.classList.contains('on')) { toggleStep(st, false); return; }
+      toggleStep(st, true, part); } else openDetail(d.dataset.detail); return; }
   const z = e.target.closest('[data-zoom]'); if (z) { openModal(`<h3 id="mTitle">${z.dataset.cap}</h3><img class="zoom-img" src="${IMG[z.dataset.zoom]}" alt="${z.dataset.cap}">`, z.dataset.zoom.startsWith('w-')); return; }
   if (e.target.closest('[data-close-modal]')) { closeModal(); return; }
   if (e.target.closest('[data-close-drawer]')) { closeDrawer(); return; }
