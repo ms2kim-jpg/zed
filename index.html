@@ -365,6 +365,8 @@ body::before{background:#fff}
 .step{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
 .step.open{border-color:#C9CEF6;box-shadow:0 8px 22px rgba(79,91,213,.10)}
 .step-toc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.toc-chip::after{content:" ▾";font-size:10px;opacity:.6}
+.toc-chip.on{background:#4F5BD5;border-color:#4F5BD5;color:#fff}.toc-chip.on::after{content:" ▴"}
 .toc-chip{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--sub-2);line-height:1.6;text-align:left}
 .toc-chip:hover{border-color:#4F5BD5;color:#2B2F6B;background:#EEF0FD}
 .detail-btn i{font-style:normal;font-size:11px;margin-left:2px}
@@ -445,7 +447,7 @@ const shots = (...xs) => `<div class="shots">${xs.map((x) => shot(x[0], x[1])).j
 const note = (kind, t, items) => `<div class="note ${kind}"><b class="t">${t}</b>${Array.isArray(items) ? '<ul>' + items.map((x) => `<li>${x}</li>`).join('') + '</ul>' : items}</div>`;
 const tbl = (head, rows) => `<div class="tbl-wrap"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 // [제목, 설명, 상세 키, 앱(v/y/w/s)]
-const steps = (list) => `<div class="steps">${list.map((s, i) => { const d = s[2] && DETAIL[s[2]]; return `<div class="step"${s[2] ? ` data-key="${s[2]}"` : ''}><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}${d ? `<div class="step-toc">${d.b.map((x, j) => `<button class="toc-chip" data-detail="${s[2]}" data-part="${j}">${x[0]}</button>`).join('')}</div>` : ''}</div></div>${s[2] ? `<button class="detail-btn" data-detail="${s[2]}" aria-expanded="false">자세히 <i>▾</i></button>` : ''}${d ? '<div class="step-det" hidden></div>' : ''}</div>`; }).join('')}</div>`;
+const steps = (list) => `<div class="steps">${list.map((s, i) => { const d = s[2] && DETAIL[s[2]]; return `<div class="step"${s[2] ? ` data-key="${s[2]}"` : ''}><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}${d ? `<div class="step-toc">${d.b.map((x, j) => `<button class="toc-chip" data-detail="${s[2]}" data-part="${j}">${x[0]}</button>`).join('')}</div>` : ''}</div></div>${d ? '<div class="step-det" hidden></div>' : ''}</div>`; }).join('')}</div>`;
 const sec = (t, small) => `<div class="sec-title">${t}${small ? ` <small>${small}</small>` : ''}</div>`;
 const markKey = '<div class="mark-key"><span><b class="r">■ 빨간 테두리</b> 꼭 눌러야 하는 버튼 · ✕ 는 누르면 안 되는 버튼</span><span><b class="y">■ 노란 테두리</b> 입력·확인하는 칸</span><span>① ② … 누르는 순서</span><span>사진을 누르면 크게 보입니다</span></div>';
 
@@ -797,7 +799,7 @@ function toggleStep(step, open, part){
   if (!d || !det) return;
   if (open === undefined) open = det.hidden;
   if (open && !det.innerHTML) det.innerHTML = `<p class="det-sub">${d.s}</p>${detailBlocks(d)}<button class="det-close" data-fold>접기 ▴</button>`;
-  det.hidden = !open; step.classList.toggle('open', open);
+  det.hidden = !open; step.classList.toggle('open', open); if (!open) step.querySelectorAll('.toc-chip.on').forEach((c) => c.classList.remove('on'));
   if (btn) { btn.setAttribute('aria-expanded', open); btn.innerHTML = open ? '접기 <i>▴</i>' : '자세히 <i>▾</i>'; }
   if (open && part != null) { const t = det.querySelector(`[data-part="${part}"]`); if (t) { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); flash(t); } }
 }
@@ -895,7 +897,10 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-open-search]')) { openSearch(); return; }
   if (e.target.closest('[data-close-search]')) { closeSearch(); return; }
   const fold = e.target.closest('[data-fold]'); if (fold) { const st = fold.closest('.step'); toggleStep(st, false); st.scrollIntoView({ block: 'nearest' }); return; }
-  const d = e.target.closest('[data-detail]'); if (d) { const st = d.closest('.step[data-key]'); if (st) { const part = d.dataset.part; toggleStep(st, part != null ? true : undefined, part != null ? +part : null); } else openDetail(d.dataset.detail); return; }
+  const d = e.target.closest('[data-detail]'); if (d) { const st = d.closest('.step[data-key]'); if (st) { const part = d.dataset.part;
+      if (part != null && st.classList.contains('open') && d.classList.contains('on')) { toggleStep(st, false); return; }
+      toggleStep(st, part != null ? true : undefined, part != null ? +part : null);
+      st.querySelectorAll('.toc-chip').forEach((c) => c.classList.toggle('on', c === d && st.classList.contains('open'))); } else openDetail(d.dataset.detail); return; }
   const z = e.target.closest('[data-zoom]'); if (z) { openModal(`<h3 id="mTitle">${z.dataset.cap}</h3><img class="zoom-img" src="${IMG[z.dataset.zoom]}" alt="${z.dataset.cap}">`, z.dataset.zoom.startsWith('w-')); return; }
   if (e.target.closest('[data-close-modal]')) { closeModal(); return; }
   if (e.target.closest('[data-close-drawer]')) { closeDrawer(); return; }
