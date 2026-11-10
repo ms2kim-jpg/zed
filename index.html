@@ -366,12 +366,15 @@ body::before{background:#fff}
 .step.open{border-color:#C9CEF6;box-shadow:0 8px 22px rgba(79,91,213,.10)}
 .step-toc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .toc-chip::after{content:" ▾";font-size:10px;opacity:.6}
-.toc-chip.pic{background:#E8F7EF;border-color:#BFE6CF;color:#0f7b4f}
-.det-shots{display:grid;gap:10px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,230px));width:max-content;max-width:100%;padding:2px;border-radius:18px}
+.two{grid-template-columns:minmax(0,1fr)!important}
+.det-shots{display:grid;gap:10px;margin-top:12px;grid-template-columns:repeat(2,minmax(0,230px));max-width:100%}
 .det-shots.n1{grid-template-columns:minmax(0,230px)}
+.det-shots.wide{grid-template-columns:minmax(0,1fr)}
+.det-shots .shot{background:#fff}
+.m-sec .mark-key{font-size:12px;gap:4px 12px;margin-top:8px}
 .det-shots .shot{position:static;padding:8px;border-radius:16px}
 .det-shots .shot figcaption{font-size:12px;margin:6px 2px 0}
-@media (max-width:640px){.det-shots{width:auto;grid-template-columns:repeat(2,minmax(0,1fr))}.det-shots.n1{grid-template-columns:minmax(0,1fr);max-width:280px}}
+@media (max-width:640px){.det-shots{grid-template-columns:repeat(2,minmax(0,1fr))}.det-shots.n1{grid-template-columns:minmax(0,1fr);max-width:280px}.det-shots.wide{grid-template-columns:minmax(0,1fr)}}
 .toc-chip.on{background:#4F5BD5;border-color:#4F5BD5;color:#fff}.toc-chip.on::after{content:" ▴"}
 .toc-chip{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--sub-2);line-height:1.6;text-align:left}
 .toc-chip:hover{border-color:#4F5BD5;color:#2B2F6B;background:#EEF0FD}
@@ -452,36 +455,31 @@ const shot = (k, cap, cls = '') => `<figure class="shot ${cls}" style="margin:0"
 const shots = (...xs) => `<div class="shots">${xs.map((x) => shot(x[0], x[1])).join('')}</div>`;
 const note = (kind, t, items) => `<div class="note ${kind}"><b class="t">${t}</b>${Array.isArray(items) ? '<ul>' + items.map((x) => `<li>${x}</li>`).join('') + '</ul>' : items}</div>`;
 const tbl = (head, rows) => `<div class="tbl-wrap"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-// 단계 카드를 펼치면 같이 보여줄 화면 사진: [상세 키, 제목에 들어간 말(정규식), [사진 키, 설명]...]
-const STEP_IMG = [
-  ['vmain', /입고 메뉴 열기/, ['v-main', 'VISE 앱 · 입고 화면']],
-  ['refresh', /메인 화면|PDA 두 앱/, ['menu', '양지 앱 · 메인 화면']],
-  ['vmain', /회차 선택/, ['v-req', 'VISE 앱 · 회차 목록']],
-  ['vunload', /회차 정보 입력/, ['v-unload', 'VISE 앱 · 회차 정보 입력']],
-  ['truck', /하차 시작/, ['unload', '양지 앱 · 입고 시작'], ['udetail', '양지 앱 · 차량 하차 기록']],
-  ['truck', /하차 완료/, ['udetail', '양지 앱 · 하차 기록']],
-  ['vparcel', /고객사 이름|송장 번호에 맞는/, ['v-preq', 'VISE 앱 · 택배 회차 목록']],
-  ['vparcel', /BOX 수량/, ['v-parcel', 'VISE 앱 · 택배 회차 정보']],
-  ['parcel', /./, ['unload', '양지 앱 · 입고 시작 (택배 탭)'], ['parcel', '양지 앱 · 택배 BOX 수']],
-  ['vinsp', /SKU 선택/, ['v-insplist', 'VISE 앱 · 검수할 SKU']],
-  ['vinsp', /검수하기/, ['v-insp', 'VISE 앱 · 검수하기']],
-  ['qty', /./, ['list', '양지 앱 · 검수 대기 목록'], ['detail', '양지 앱 · 검수 입력']],
-  ['vcharge', /./, ['v-charge', 'VISE 앱 · 과금 내역 입력 (실셈)']],
-  ['pick', /./, ['put', '양지 앱 · ① PLT 고르기']],
-  ['loc', /수기/, ['put-plt', 'PLT (바퀴)'], ['put-cell', 'CELL (바퀴)']],
-  ['loc', /QR/, ['put-level', '통합 QR → 단 선택']],
-  ['loc', /최종 주소/, ['put-plt', '아래쪽 최종 선택 로케이션 주소']],
-  ['photo', /./, ['put-photo', '양지 앱 · ③ 사진']],
-  ['vdone', /./, ['v-insplist', 'VISE 앱 · 맨 아래 입고 완료'], ['hist', '양지 앱 · 작업 내역']],
-  ['wconfirm', /./, ['w-list', 'VISE WEB · 등록됨 → 입고 확인']],
-  ['settle', /SKU 체크|저장/, ['w-sku', 'VISE WEB · 입고 요청서 상세']],
-  ['settle', /정산 정보|추가|작업 이미지/, ['w-settle', 'VISE WEB · 정산 정보']],
-  ['settle', /정산/, ['w-settle', 'VISE WEB · 정산 정보'], ['w-sku', 'VISE WEB · 입고 요청서 상세']],
-];
-const stepImgs = (k, title) => { const t = String(title).replace(/<[^>]+>/g, ''); const r = STEP_IMG.find((x) => x[0] === k && x[1].test(t)); return r ? r.slice(2).filter((x) => IMG[x[0]]) : []; };
+// 하위 탭(상세 블록)마다 같이 보여줄 화면 사진: '상세 키:블록 번호' → [사진 키, 설명]
+const BLOCK_IMG = {
+  'vmain:0': [['v-main', 'VISE 앱 · 입고 (확인됨 · 입고중 탭)']],
+  'refresh:0': [['menu', '양지 앱 · 메인 화면']],
+  'vunload:0': [['v-req', 'VISE 앱 · 입고 요청서 (회차 목록)'], ['v-unload', 'VISE 앱 · 회차 정보 입력']],
+  'vparcel:0': [['v-preq', 'VISE 앱 · 택배 회차 목록 (①)'], ['v-parcel', 'VISE 앱 · 택배 회차 정보 (② 택배사·송장 ③ 도착 이미지)']],
+  'truck:0': [['unload', '양지 앱 · 입고 시작 (하차)'], ['udetail', '양지 앱 · 차량 하차 기록']],
+  'parcel:0': [['parcel', '양지 앱 · 택배 BOX']],
+  'vinsp:0': [['v-insp', 'VISE 앱 · 검수하기']],
+  'vinsp:1': [['v-insplist', 'VISE 앱 · 검수할 SKU']],
+  'qty:0': [['list', '양지 앱 · 검수 대기 목록'], ['detail', '양지 앱 · 검수 입력']],
+  'vcharge:0': [['v-charge', 'VISE 앱 · 과금 내역 입력 (실셈)']],
+  'ycharge:0': [['detail', '양지 앱 · 💰 과금 입력 (검수 화면 아래)']],
+  'pick:0': [['put', '양지 앱 · ① PLT 고르기']],
+  'loc:0': [['put-level', '📦 PLT 통합 QR → 단 선택']],
+  'loc:1': [['put-plt', '📦 PLT (수기: 바퀴)'], ['put-cell', '🗄️ CELL (수기: 바퀴)']],
+  'photo:0': [['put-photo', '양지 앱 · ③ 사진 (필수)']],
+  'vdone:0': [['v-insplist', 'VISE 앱 · 맨 아래 입고 완료']],
+  'vdone:1': [['hist', '양지 앱 · 작업 내역']],
+  'wconfirm:0': [['w-list', 'VISE WEB · 입고 (① 등록됨 탭 → ② 입고 확인)']],
+  'settle:0': [['w-settle', 'VISE WEB · 정산 정보 (① 입력 → ② 추가 → ④ 이미지·메모 → ⑥ 정산 정보 전송)'], ['w-sku', 'VISE WEB · 입고 요청서 상세 (③ SKU 선택 완료 → ⑤ 저장 · ✕ 입고 완료 누르지 말 것)']],
+};
 function escA(t){ return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 // [제목, 설명, 상세 키, 앱(v/y/w/s)]
-const steps = (list) => `<div class="steps">${list.map((s, i) => { const d = s[2] && DETAIL[s[2]]; return `<div class="step"${s[2] ? ` data-key="${s[2]}" data-imgs="${escA(JSON.stringify(stepImgs(s[2], s[0])))}"` : ''}><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}${d ? `<div class="step-toc">${stepImgs(s[2], s[0]).length ? `<button class="toc-chip pic" data-detail="${s[2]}" data-part="img">📷 화면 ${stepImgs(s[2], s[0]).length}</button>` : ''}${d.b.map((x, j) => `<button class="toc-chip" data-detail="${s[2]}" data-part="${j}">${x[0]}</button>`).join('')}</div>` : ''}</div></div>${d ? '<div class="step-det" hidden></div>' : ''}</div>`; }).join('')}</div>`;
+const steps = (list) => `<div class="steps">${list.map((s, i) => { const d = s[2] && DETAIL[s[2]]; return `<div class="step"${s[2] ? ` data-key="${s[2]}"` : ''}><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}${d ? `<div class="step-toc">${d.b.map((x, j) => `<button class="toc-chip" data-detail="${s[2]}" data-part="${j}">${x[0]}</button>`).join('')}</div>` : ''}</div></div>${d ? '<div class="step-det" hidden></div>' : ''}</div>`; }).join('')}</div>`;
 const sec = (t, small) => `<div class="sec-title">${t}${small ? ` <small>${small}</small>` : ''}</div>`;
 const markKey = '<div class="mark-key"><span><b class="r">■ 빨간 테두리</b> 꼭 눌러야 하는 버튼 · ✕ 는 누르면 안 되는 버튼</span><span><b class="y">■ 노란 테두리</b> 입력·확인하는 칸</span><span>① ② … 누르는 순서</span><span>사진을 누르면 크게 보입니다</span></div>';
 
@@ -612,7 +610,7 @@ const SECTIONS = [
         ['라벨 프린터 연결', '🖨️ 버튼 → 프린터 선택 (PLT 라벨은 양지 앱에서만 출력)', 'printer', 'y'],
         ['메인 화면 확인', '오늘 진행률 · 빨간 숫자 = 남은 작업 (입고 시작 · 검수 · 적치 · 라벨 미출력)', 'refresh', 'y']])}
       ${note('warn', '⚠️ PDA 에서 안 되는 것', ['VISE <b>등록됨 · 승인대기</b> 건은 PDA 에서 작업할 수 없습니다. 관리자가 VISE WEB 에서 처리합니다.'])}
-    </div>${shots(['v-main', 'VISE 앱 · 입고 (확인됨 · 입고중 탭)'], ['menu', '양지 앱 · 메인 화면'])}</div>` },
+    </div></div>` },
 
   { id: 'unload', group: '📱 현장 PDA', num: '2', title: '하차', sub: '차량 · 택배 회차 정보 · 하차 기록', html: () => `
     <div class="panel-head"><div><div class="badges">${V}${Y}</div><h2>하차</h2><p class="desc">VISE 앱에는 회차 정보(<b>차량</b>: 차량번호 · PLT/BOX · 도착 사진 / <b>택배</b>: 송장 번호에 맞는 회차 · 송장 사진)를, 양지 앱에는 하차 기록(차량: 톤수 · 대수 · 하차 시간 / 택배: BOX 수)을 남깁니다.</p></div><div class="chip">VISE 상태: 확인됨</div></div>
@@ -630,7 +628,7 @@ const SECTIONS = [
         ['BOX 수량 · 택배사명 · 송장 번호 · 도착 이미지', '도착 이미지는 <b>송장 번호가 보이게</b> 찍습니다.', 'vparcel', 'v'],
         ['입고 시작 → 택배 → BOX 수 저장', '저장하면 바로 목록으로', 'parcel', 'y']])}
       ${note('warn', '📸 도착 이미지 (VISE 앱)', ['<b>차량</b>: 차량 번호판과 차량에 실린 PLT · 박스가 모두 보이게', '<b>택배</b>: 그 회차의 <b>송장 번호가 보이게</b> (송장 번호와 회차가 맞는지 꼭 확인)'])}
-    </div><div style="display:grid;gap:14px">${shots(['v-req', 'VISE 앱 · 입고 요청서 (회차 목록)'], ['v-unload', 'VISE 앱 · 회차 정보 입력'])}${shots(['v-preq', 'VISE 앱 · 택배 회차 목록 (①)'], ['v-parcel', 'VISE 앱 · 택배 회차 정보 (② 택배사·송장 ③ 도착 이미지)'])}${shots(['udetail', '양지 앱 · 차량 하차 기록'], ['parcel', '양지 앱 · 택배 BOX'])}</div></div>` },
+    </div></div>` },
 
   { id: 'insp', group: '📱 현장 PDA', num: '3', title: '검수', sub: 'VISE 검수 · 양지 PLT 라벨', html: () => `
     <div class="panel-head"><div><div class="badges">${V}${Y}</div><h2>검수</h2><p class="desc">SKU 마다 VISE 앱에 검수 수량 · 입수량 · 체적을 넣고, 양지 앱에서 같은 수량으로 검수완료해 PLT 라벨을 뽑아 붙입니다.</p></div><div class="chip">VISE 상태: 입고중</div></div>
@@ -647,7 +645,7 @@ const SECTIONS = [
       ${note('danger', '⛔ 과입고는 검수하지 않습니다', ['요청수량보다 많은 수량은 양지 앱에서 <b>입력할 수 없습니다</b> (검수완료 버튼이 꺼지고, 스캔 +1 도 요청수량에서 멈춤).', '초과분은 따로 보관 → 고객사에 <b>요청서 재작성</b> 요청 → 새 요청서(<b>긴급입고</b>)가 들어오면 그 건으로 검수합니다. 그래야 과입고 건을 따로 추적할 수 있습니다.'])}
       ${note('danger', '🚫 끝내 안 들어온 수량 (양지 앱 · 관리자)', '잔량이나 상품이 끝내 안 오면 관리자 계정으로 그 건을 열고 맨 아래 <b>🚫 미입고 처리 (관리자)</b>를 누릅니다. 양지 앱 검수 목록에서 빠지고 시트 상태가 미입고가 됩니다.')}
       ${note('danger', '⚠️ 두 앱의 검수 정보는 모두 같아야 합니다', ['<b>검수 수량 · 소비기한 · LOT</b> 등 두 앱에 넣은 정보가 <b>모두 같아야</b> 합니다.', '다르면 정산 · 재고가 어긋납니다. 하나를 고치면 다른 앱도 같이 고쳐 주세요.'])}
-    </div><div style="display:grid;gap:14px">${shots(['v-insplist', 'VISE 앱 · 검수할 SKU'], ['v-insp', 'VISE 앱 · 검수하기'])}${shots(['list', '양지 앱 · 검수 대기 목록'], ['detail', '양지 앱 · 검수 입력'])}</div></div>` },
+    </div></div>` },
 
   { id: 'charge', group: '📱 현장 PDA', num: '4', title: '과금', sub: '실셈 = VISE · 그 외 = 양지', html: () => `
     <div class="panel-head"><div><div class="badges">${V}${Y}</div><h2>과금</h2><p class="desc"><b>실셈</b>은 VISE 앱에 입력하면 WEB 에 자동으로 들어갑니다. <b>실셈 외 작업</b>은 양지 앱에 사진과 함께 기록해 두고, 승인대기 때 관리자가 VISE WEB 정산 정보에 추가합니다.</p></div></div>
@@ -671,7 +669,7 @@ const SECTIONS = [
         ['<b style="white-space:nowrap">긴급입고</b>', '요청서 <b>작성일자 미준수</b> 건<br><b>과입고</b>된 재고 <span style="color:var(--warn)">(고객사와 소통 후 요청서 작성)</span>', '개'],
         ['<b style="white-space:nowrap">혼적 분리</b>', '1 PLT 에 <b>3 SKU 까지는 비용 없음</b> · <b>4 SKU 부터</b> 분리 비용 청구', '박스']])}
       ${note('info', '💡 단가는 입고 시트 [과금단가] 탭 기준', '양지 앱에서 항목별 수량만 넣으면 금액은 단가표대로 계산됩니다. 바코드 부착 · 긴급입고는 <b>고객사와 먼저 소통</b>한 뒤 진행하고 기록하세요.')}
-    </div>${shots(['v-charge', 'VISE 앱 · 과금 내역 입력 (실셈)'], ['detail', '양지 앱 · 💰 과금 입력'])}</div>` },
+    </div></div>` },
 
   { id: 'put', group: '📱 현장 PDA', num: '5', title: '적치', sub: 'PLT → 로케이션 → 사진', html: () => `
     <div class="panel-head"><div><div class="badges">${Y}</div><h2>적치</h2><p class="desc">검수완료된 PLT 를 보관 로케이션에 올리고 사진으로 남깁니다. 양지 앱에서만 합니다.</p></div></div>
@@ -687,7 +685,7 @@ const SECTIONS = [
         ['🗄️ CELL', '셀 선반 · 단이 <b>2자리</b>', '<span class="mono">B01-05-11-01</span>']])}
       ${note('danger', '⛔ 적치가 안 될 때', ['입고 시트 [LOC master] 에 없는 로케이션', '로케이션 마스터가 앱에 없을 때 (관리자 문의)'])}
       ${note('warn', '⚠️ 정물일치', '한 로케이션에는 한 SKU 만 보관합니다. 다른 상품이 있으면 경고가 뜹니다.')}
-    </div><div class="shots" style="position:static">${shot('put', '① PLT 고르기')}${shot('put-level', '② 📦 PLT 통합 QR → 단 선택')}${shot('put-plt', '② 로케이션 · 📦 PLT (수기: 바퀴)')}${shot('put-cell', '② 로케이션 · 🗄️ CELL (수기: 바퀴)')}${shot('put-photo', '③ 사진 (필수)')}</div></div>` },
+    </div></div>` },
 
   { id: 'done', group: '📱 현장 PDA', num: '6', title: '입고 완료', sub: 'VISE 입고 완료 · 작업 내역', html: () => `
     <div class="panel-head"><div><div class="badges">${V}${Y}</div><h2>입고 완료</h2><p class="desc">입고 건의 모든 SKU 검수가 끝나면 VISE 앱에서 입고 완료를 누릅니다. 승인대기로 넘어갑니다.</p></div><div class="chip">입고중 → 승인대기</div></div>
@@ -696,7 +694,7 @@ const SECTIONS = [
         ['검수전 SKU 확인 후 맨 아래 입고 완료', '검수전이 남아 있지 않은지 · 오차 SKU 실제 수량 재확인 → 입고 완료 → 승인대기', 'vdone', 'v'],
         ['양지 앱 작업 내역 확인', '적치 대기 PLT · 🏷️ 라벨 미출력이 남아 있지 않은지', '', 'y']])}
       ${note('info', '📋 양지 앱 작업 내역', ['전체 · 적치 대기 · 적치 완료 · 내 작업 · 🏷️ 라벨 미출력 탭', '라벨이 떨어지거나 훼손되면 작업 상세에서 <b>라벨 재출력</b>'])}
-    </div>${shots(['v-insplist', 'VISE 앱 · 맨 아래 입고 완료'], ['hist', '양지 앱 · 작업 내역'])}</div>` },
+    </div></div>` },
 
   { id: 'am', group: '🖥️ 사무실 (관리자)', num: '7', title: '업무 준비', sub: '18시 이후 다음날 데이터 · 업무 전 점검', html: () => `
     <div class="panel-head"><div><div class="badges">${W}${S}</div><h2>업무 준비</h2><p class="desc">그날 작업을 마감한 뒤 <b>18시 이후</b> 다음 영업일 입고 건을 VISE WEB 에서 확인됨으로 넘기고, 입고 시트에서 검수 목록을 미리 만들어 둡니다. 다음날 업무 전에는 점검만 합니다.</p></div><div class="chip">전날 18시 이후</div></div>
@@ -714,8 +712,6 @@ const SECTIONS = [
       ['검수 목록이 만들어져 있는지', '[입고] 탭 · 늦게 들어온 건은 엑셀을 다시 받아 ① 올리기 → ② (이미 올린 건은 자동으로 건너뜀)', 'cap', 's'],
       ['기본로케이션 지정됐는지', '📥 1 → 📍 기본로케이션 미지정 다시 확인 (지정된 SKU 는 탭에서 빠짐)', 'locmiss', 's'],
       ['PDA 두 앱 · 프린터 확인', 'VISE 앱 사원증 로그인 · 양지 앱 ↻ 새로고침 · 프린터 연결', 'refresh', 'y']])}
-    ${markKey}
-    ${shot('w-list', 'VISE WEB · 입고 (① 등록됨 탭 → ② 입고 확인)', 'wide')}
     ${note('warn', '⚠️ 입고 시트 [입고] 탭', '필터(숨기기)는 괜찮지만 <b>정렬</b>은 하지 마세요. 여러 명이 볼 때는 <b>데이터 → 필터 보기</b>를 쓰세요.')}` },
 
   { id: 'settle', group: '🖥️ 사무실 (관리자)', num: '8', title: '승인대기 · 정산 리포트', sub: '비용 발생 건 · 저장 → 전송', html: () => `
@@ -728,8 +724,6 @@ const SECTIONS = [
       ['작업 이미지 · 작업 메모 (필수)', '양지 앱 과금 사진 (드라이브 과금사진 폴더) 활용', 'settle', 'w'],
       ['입고 요청서 맨 위 저장', '', 'settle', 'w'],
       ['연동 정산 정보 → 정산 정보 전송', '정산 정보 전송 필수 · 빠뜨리면 정산이 넘어가지 않음', 'settle', 'w']])}
-    ${markKey}
-    <div class="wide-pair">${shot('w-settle', 'VISE WEB · 정산 정보 (① 입력 → ② 추가 → ④ 이미지·메모 → ⑥ 정산 정보 전송)', 'wide')}${shot('w-sku', 'VISE WEB · 입고 요청서 상세 (③ SKU 선택 완료 → ⑤ 저장 · ✕ 입고 완료 누르지 말 것)', 'wide')}</div>
     ${note('danger', '⛔ 자주 빠뜨리는 것', ['<b>저장만 하고 정산 정보 전송을 안 누름</b> → 정산이 넘어가지 않습니다.', '작업 이미지 · 메모가 비어 있으면 저장되지 않습니다.'])}
     ${note('info', '💡 과금 입력 참고', '실셈을 VISE 앱에 넣지 못하고 입고 처리된 건은 양지 앱에서 실셈을 입력합니다. 입고 시트 [과금] 탭에서 확인해 정산 정보 <b>실셈 수량</b>에 직접 넣으세요. → [4. 과금]')}
     ${note('info', '💡 무엇을 넣을지는 입고 시트에서', '입고 시트 <b>[과금]</b> 탭에 양지 앱에서 입력한 항목 · 수량 · 금액 · 사진 링크가 있습니다.')}` },
@@ -822,18 +816,20 @@ function render(){
 }
 function go(id){ closeDrawer(); const h = '#' + id; if (location.hash !== h) location.hash = h; else render(); window.scrollTo({ top: 0 }); }
 function openModal(html, wide){ document.getElementById('mBody').innerHTML = html; const m = document.getElementById('modal'); m.querySelector('.modal-dialog').classList.toggle('wide', !!wide); m.hidden = false; m.querySelector('.modal-close').focus(); }
-function detailBlocks(d){ return d.b.map((x, j) => `<div class="m-sec" data-part="${j}"><h4>${x[0]}</h4>${x[1].startsWith('<') ? x[1] : `<p>${x[1]}</p>`}</div>`).join(''); }
+function blockImgs(k, j){ const ims = (BLOCK_IMG[k + ':' + j] || []).filter((x) => IMG[x[0]]); if (!ims.length) return '';
+  const wide = ims.every((x) => x[0].startsWith('w-'));
+  return `<div class="det-shots ${wide ? 'wide' : ims.length > 1 ? 'n2' : 'n1'}">${ims.map((x) => shot(x[0], x[1])).join('')}</div>${ims.some((x) => /^[vw]-/.test(x[0])) ? markKey : ''}`; }
+function detailBlocks(d, k){ return d.b.map((x, j) => `<div class="m-sec" data-part="${j}"><h4>${x[0]}</h4>${x[1].startsWith('<') ? x[1] : `<p>${x[1]}</p>`}${blockImgs(k, j)}</div>`).join(''); }
 function openDetail(k){
   const d = DETAIL[k]; if (!d) return;
-  openModal(`<h3 id="mTitle">${d.t}</h3><p class="modal-sub">${d.s}</p>${detailBlocks(d)}`);
+  openModal(`<h3 id="mTitle">${d.t}</h3><p class="modal-sub">${d.s}</p>${detailBlocks(d, k)}`);
 }
 // 단계 카드 안에서 자세히 펼치기 / 접기
 function toggleStep(step, open, part){
   const k = step.dataset.key, d = DETAIL[k], det = step.querySelector('.step-det'), btn = step.querySelector('.detail-btn');
   if (!d || !det) return;
   if (open === undefined) open = det.hidden;
-  let ims = []; try { ims = JSON.parse(step.dataset.imgs || '[]'); } catch (e) {}
-  if (open && !det.innerHTML) det.innerHTML = `<p class="det-sub">${d.s}</p>${ims.length ? `<div class="det-shots n${Math.min(ims.length, 2)}" data-part="img">${ims.map((x) => shot(x[0], x[1])).join('')}</div>` : ''}${detailBlocks(d)}<button class="det-close" data-fold>접기 ▴</button>`;
+  if (open && !det.innerHTML) det.innerHTML = `<p class="det-sub">${d.s}</p>${detailBlocks(d, k)}<button class="det-close" data-fold>접기 ▴</button>`;
   det.hidden = !open; step.classList.toggle('open', open); if (!open) step.querySelectorAll('.toc-chip.on').forEach((c) => c.classList.remove('on'));
   if (btn) { btn.setAttribute('aria-expanded', open); btn.innerHTML = open ? '접기 <i>▴</i>' : '자세히 <i>▾</i>'; }
   if (open && part != null) { const t = det.querySelector(`[data-part="${part}"]`); if (t) { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); flash(t); } }
