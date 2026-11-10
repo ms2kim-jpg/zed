@@ -359,10 +359,48 @@ body::before{background:#fff}
 .rule-dot{background:#EEF0FD;color:#3440B0}
 .chip{background:#EEF0FD;border-color:#D7DBF8;color:#3440B0}
 </style>
+
+<style>
+/* ===== 단계 카드 그 자리 펼치기 · 검색 ===== */
+.step{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.step.open{border-color:#C9CEF6;box-shadow:0 8px 22px rgba(79,91,213,.10)}
+.step-toc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.toc-chip{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--sub-2);line-height:1.6;text-align:left}
+.toc-chip:hover{border-color:#4F5BD5;color:#2B2F6B;background:#EEF0FD}
+.detail-btn i{font-style:normal;font-size:11px;margin-left:2px}
+.step.open .detail-btn{background:#EEF0FD;border-color:#C9CEF6}
+.step-det{grid-column:1/-1;min-width:0;border-top:1px dashed var(--line);padding-top:6px;margin-top:2px}
+.det-sub{margin:6px 0 0;font-size:14px;color:var(--sub)}
+.step-det .m-sec{margin-top:10px;background:var(--surface-2)}
+.det-close{display:block;width:100%;margin-top:12px;min-height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--sub-2);font-weight:800;font-size:13.5px}
+.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 3px #FACC15}100%{box-shadow:0 0 0 0 transparent}}
+mark,mark.hl{background:#FEF08A;color:inherit;border-radius:3px;padding:0 1px}
+.s-open{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0 0 6px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--sub);font-size:14px;font-weight:700}
+.s-open:hover{border-color:#4F5BD5;color:#2B2F6B}
+.s-open kbd{font:inherit;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:0 6px;background:#fff}
+.hero-search{display:flex;align-items:center;gap:10px;width:100%;max-width:560px;margin-top:20px;padding:14px 18px;border-radius:14px;background:#fff;color:#1A1D2E;font-size:15.5px;font-weight:800;text-align:left;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.hero-search span{font-size:13px;font-weight:600;color:#7A7F95}
+.search{position:fixed;inset:0;z-index:1000}
+.search-box{position:absolute;top:max(16px,env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(720px,calc(100vw - 24px));max-height:calc(100vh - 32px);display:flex;flex-direction:column;background:var(--surface);border-radius:20px;box-shadow:0 24px 80px rgba(15,23,42,.25);overflow:hidden}
+.search-top{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--line)}
+.search-top input{flex:1;min-width:0;height:46px;border:2px solid #C9CEF6;border-radius:12px;padding:0 14px;font:inherit;font-size:16px;outline:none}
+.search-top input:focus{border-color:#4F5BD5}
+.search-res{overflow-y:auto;padding:8px 12px 14px}
+.s-count{margin:4px 4px 6px;font-size:12.5px;color:var(--sub);font-weight:700}
+.s-empty{margin:14px 6px;color:var(--sub);font-size:14px}
+.s-hit{display:block;width:100%;text-align:left;padding:11px 12px;border-radius:12px;border:1px solid transparent}
+.s-hit+.s-hit{margin-top:2px}
+.s-hit:hover,.s-hit:focus-visible{background:var(--surface-2);border-color:var(--line)}
+.s-hit small{display:block;font-size:11.5px;font-weight:800;color:#4F5BD5}
+.s-hit b{display:block;font-size:14.5px;line-height:1.45}
+.s-hit span{display:block;font-size:13px;color:var(--sub);line-height:1.6;margin-top:2px}
+@media (max-width:640px){.step{grid-template-columns:minmax(0,1fr)}.step-toc{margin-top:10px}.hero-search span{display:none}}
+</style>
 <div class="mobile-top">
   <div class="mobile-top-inner">
     <div class="logo" data-go="home" style="margin:0"><div class="logo-mark">B2F</div><div class="logo-text"><strong>양지센터 B2F 입고 가이드</strong></div></div>
-    <button class="mobile-menu" id="menuOpen" aria-label="가이드 메뉴 열기">☰</button>
+    <div style="display:flex;gap:8px"><button class="mobile-menu" data-open-search aria-label="가이드 검색">🔍</button><button class="mobile-menu" id="menuOpen" aria-label="가이드 메뉴 열기">☰</button></div>
   </div>
 </div>
 <div class="drawer-wrap" id="drawer" hidden>
@@ -376,9 +414,18 @@ body::before{background:#fff}
 <div class="layout">
   <aside class="sidebar">
     <div class="logo" data-go="home"><div class="logo-mark">B2F</div><div class="logo-text"><strong>양지센터 B2F<br>입고 가이드</strong><span>poomgo · VISE + 양지 입고 앱</span></div></div>
+    <button class="s-open" data-open-search><span>🔍 가이드 검색</span><kbd>/</kbd></button>
     <div id="navDesk"></div>
   </aside>
   <main class="main"><div class="main-inner" id="view"></div></main>
+</div>
+
+<div class="search" id="search" hidden>
+  <div class="modal-bg" data-close-search></div>
+  <div class="search-box" role="dialog" aria-label="가이드 검색">
+    <div class="search-top"><input id="sInput" type="search" placeholder="단어 일부로 검색 (예: 기본로, 과입고)" autocomplete="off" enterkeyhint="search"><button class="icon-btn" data-close-search aria-label="검색 닫기">×</button></div>
+    <div class="search-res" id="sResults"></div>
+  </div>
 </div>
 
 <div class="modal" id="modal" hidden>
@@ -398,7 +445,7 @@ const shots = (...xs) => `<div class="shots">${xs.map((x) => shot(x[0], x[1])).j
 const note = (kind, t, items) => `<div class="note ${kind}"><b class="t">${t}</b>${Array.isArray(items) ? '<ul>' + items.map((x) => `<li>${x}</li>`).join('') + '</ul>' : items}</div>`;
 const tbl = (head, rows) => `<div class="tbl-wrap"><table><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 // [제목, 설명, 상세 키, 앱(v/y/w/s)]
-const steps = (list) => `<div class="steps">${list.map((s, i) => `<div class="step"><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}</div></div>${s[2] ? `<button class="detail-btn" data-detail="${s[2]}">자세히</button>` : ''}</div>`).join('')}</div>`;
+const steps = (list) => `<div class="steps">${list.map((s, i) => { const d = s[2] && DETAIL[s[2]]; return `<div class="step"${s[2] ? ` data-key="${s[2]}"` : ''}><div class="step-l"><div class="step-no ${s[3] || ''}">${String(i + 1).padStart(2, '0')}</div><div class="step-copy"><strong>${s[3] ? PILL[s[3]] : ''}${s[0]}</strong>${s[1] ? `<span>${s[1]}</span>` : ''}${d ? `<div class="step-toc">${d.b.map((x, j) => `<button class="toc-chip" data-detail="${s[2]}" data-part="${j}">${x[0]}</button>`).join('')}</div>` : ''}</div></div>${s[2] ? `<button class="detail-btn" data-detail="${s[2]}" aria-expanded="false">자세히 <i>▾</i></button>` : ''}${d ? '<div class="step-det" hidden></div>' : ''}</div>`; }).join('')}</div>`;
 const sec = (t, small) => `<div class="sec-title">${t}${small ? ` <small>${small}</small>` : ''}</div>`;
 const markKey = '<div class="mark-key"><span><b class="r">■ 빨간 테두리</b> 꼭 눌러야 하는 버튼 · ✕ 는 누르면 안 되는 버튼</span><span><b class="y">■ 노란 테두리</b> 입력·확인하는 칸</span><span>① ② … 누르는 순서</span><span>사진을 누르면 크게 보입니다</span></div>';
 
@@ -691,6 +738,7 @@ const HOME = () => `
     <h1>양지센터 B2F 입고 가이드</h1>
     <p class="lead">현장에서는 <b>VISE 앱</b>과 <b>양지 입고 앱</b>을 같이 씁니다. 두 앱과 VISE WEB · 입고 시트를 공정 순서대로 묶어 정리한 poomgo 입고 파트 실무 가이드입니다.</p>
     <div class="legend"><span class="badge vs">📱 VISE 앱</span><span class="badge yj">📱 양지 앱</span><span class="badge web">🖥️ VISE WEB</span><span class="badge sheet">📄 입고 시트</span></div>
+    <button class="hero-search" data-open-search>🔍 무엇이든 검색 <span>예: 기본로케이션 · 과입고 · 정산</span></button>
   </section>
   <section class="panel home-body">
     <h2><span class="sec-no">!</span>작업 전 반드시 확인해주세요</h2>
@@ -734,18 +782,120 @@ function render(){
   document.getElementById('navDesk').innerHTML = navHtml(s ? s.id : '');
   document.getElementById('navMobile').innerHTML = navHtml(s ? s.id : '');
   document.title = (s ? s.title + ' · ' : '') + '양지센터 B2F 입고 가이드';
+  if (PENDING && s && PENDING.o.sec === s.id) { const h = PENDING; PENDING = null; requestAnimationFrame(() => applyHit(h.o, h.raw)); }
 }
 function go(id){ closeDrawer(); const h = '#' + id; if (location.hash !== h) location.hash = h; else render(); window.scrollTo({ top: 0 }); }
 function openModal(html, wide){ document.getElementById('mBody').innerHTML = html; const m = document.getElementById('modal'); m.querySelector('.modal-dialog').classList.toggle('wide', !!wide); m.hidden = false; m.querySelector('.modal-close').focus(); }
+function detailBlocks(d){ return d.b.map((x, j) => `<div class="m-sec" data-part="${j}"><h4>${x[0]}</h4>${x[1].startsWith('<') ? x[1] : `<p>${x[1]}</p>`}</div>`).join(''); }
 function openDetail(k){
   const d = DETAIL[k]; if (!d) return;
-  openModal(`<h3 id="mTitle">${d.t}</h3><p class="modal-sub">${d.s}</p>${d.b.map((x) => `<div class="m-sec"><h4>${x[0]}</h4>${x[1].startsWith('<') ? x[1] : `<p>${x[1]}</p>`}</div>`).join('')}`);
+  openModal(`<h3 id="mTitle">${d.t}</h3><p class="modal-sub">${d.s}</p>${detailBlocks(d)}`);
 }
+// 단계 카드 안에서 자세히 펼치기 / 접기
+function toggleStep(step, open, part){
+  const k = step.dataset.key, d = DETAIL[k], det = step.querySelector('.step-det'), btn = step.querySelector('.detail-btn');
+  if (!d || !det) return;
+  if (open === undefined) open = det.hidden;
+  if (open && !det.innerHTML) det.innerHTML = `<p class="det-sub">${d.s}</p>${detailBlocks(d)}<button class="det-close" data-fold>접기 ▴</button>`;
+  det.hidden = !open; step.classList.toggle('open', open);
+  if (btn) { btn.setAttribute('aria-expanded', open); btn.innerHTML = open ? '접기 <i>▴</i>' : '자세히 <i>▾</i>'; }
+  if (open && part != null) { const t = det.querySelector(`[data-part="${part}"]`); if (t) { t.scrollIntoView({ block: 'center', behavior: 'smooth' }); flash(t); } }
+}
+function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+
+// ------------------------------------------------------------------ 검색
+const NORM = (t) => { let n = '', map = []; for (let i = 0; i < t.length; i++) { const c = t[i]; if (/\s/.test(c)) continue; n += c.toLowerCase(); map.push(i); } return { n, map }; };
+const textOf = (html) => { const tp = document.createElement('template'); tp.innerHTML = html; tp.content.querySelectorAll('img,script,style').forEach((x) => x.remove()); return (tp.content.textContent || '').replace(/\s+/g, ' ').trim(); };
+const BLOCK_SEL = '.panel-head .desc, .note li, .note > b.t, .tbl-wrap tr, .faq-item, .flow-step, table.lane td.on';
+let SIDX = null;
+function buildIndex(){
+  const idx = [];
+  const add = (o) => { o.N = NORM(o.text); idx.push(o); };
+  const secName = (s) => (/^\d+$/.test(s.num) ? s.num + '. ' : '') + s.title;
+  SECTIONS.forEach((s) => {
+    const tp = document.createElement('template'); tp.innerHTML = s.html();
+    const c = tp.content;
+    c.querySelectorAll('.step').forEach((st, i) => {
+      const k = st.dataset.key, d = k && DETAIL[k];
+      const sg = st.querySelector('.step-copy strong'); if (sg) sg.querySelectorAll('.pill').forEach((x) => x.remove());
+      const title = (sg || {}).textContent || '';
+      const sub = (st.querySelector('.step-copy > span') || {}).textContent || '';
+      add({ sec: s.id, secName: secName(s), kind: 'step', i, title: title.trim(), text: title + ' · ' + sub, rank: 0 });
+      if (d) {
+        add({ sec: s.id, secName: secName(s), kind: 'step', i, title: title.trim(), text: d.t + ' · ' + d.s, rank: 1 });
+        d.b.forEach((b, j) => add({ sec: s.id, secName: secName(s), kind: 'step', i, k, part: j, title: title.trim() + ' › ' + b[0], text: textOf(b[1]), rank: 2 }));
+      }
+    });
+    c.querySelectorAll(BLOCK_SEL).forEach((el, i) => {
+      if (el.closest('.step')) return;
+      const t = el.textContent.replace(/\s+/g, ' ').trim(); if (t.length < 2) return;
+      const head = el.closest('.note') ? (el.closest('.note').querySelector('b.t') || {}).textContent
+        : el.matches('.faq-item') ? (el.querySelector('.faq-q') || {}).textContent
+        : el.matches('tr') ? (el.cells[0] || {}).textContent
+        : el.matches('.flow-step') ? (el.querySelector('b') || {}).textContent
+        : el.matches('td') ? '업무 흐름표' : el.matches('.desc') ? '설명' : '';
+      add({ sec: s.id, secName: secName(s), kind: 'block', i, title: (head || '').replace(/[+−]$/, '').trim() || '본문', text: t, rank: 3 });
+    });
+    add({ sec: s.id, secName: secName(s), kind: 'sec', title: s.title, text: s.title + ' · ' + s.sub, rank: -1 });
+  });
+  return idx;
+}
+const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function snippet(o, q){
+  const at = o.N.n.indexOf(q); if (at < 0) return esc(o.text.slice(0, 80));
+  const a = o.N.map[at], b = o.N.map[at + q.length - 1] + 1;
+  const from = Math.max(0, a - 28), to = Math.min(o.text.length, b + 50);
+  return (from > 0 ? '…' : '') + esc(o.text.slice(from, a)) + '<mark>' + esc(o.text.slice(a, b)) + '</mark>' + esc(o.text.slice(b, to)) + (to < o.text.length ? '…' : '');
+}
+function doSearch(raw){
+  const box = document.getElementById('sResults'), q = NORM(raw).n;
+  if (!q) { box.innerHTML = '<p class="s-empty">단어 일부만 넣어도 찾습니다. 예: <b>기본로</b> · <b>과입고</b> · <b>정산</b> · <b>라벨</b></p>'; return; }
+  if (!SIDX) SIDX = buildIndex();
+  const seen = new Set(), hits = [];
+  SIDX.filter((o) => o.N.n.includes(q)).sort((a, b) => a.rank - b.rank).forEach((o) => {
+    const key = o.kind === 'step' ? o.sec + '|s' + o.i + '|' + (o.part ?? '') : o.sec + '|' + o.kind + o.i;
+    const stepKey = o.kind === 'step' ? o.sec + '|s' + o.i : null;
+    if (seen.has(key) || (stepKey && o.rank < 2 && seen.has(stepKey))) return;
+    seen.add(key); if (stepKey && o.rank < 2) seen.add(stepKey);
+    const sig = o.sec + '|' + (o.k ? o.k + '|' + o.part : o.title) + '|' + snippet(o, q); if (seen.has(sig)) return; seen.add(sig);
+    hits.push(o);
+  });
+  const order = SECTIONS.map((s) => s.id); hits.sort((a, b) => order.indexOf(a.sec) - order.indexOf(b.sec) || a.rank - b.rank);
+  box.innerHTML = hits.length ? `<p class="s-count">${hits.length}건</p>` + hits.slice(0, 60).map((o, n) => `<button class="s-hit" data-hit="${n}"><small>${esc(o.secName)}</small><b>${esc(o.title)}</b><span>${snippet(o, q)}</span></button>`).join('') : '<p class="s-empty">찾는 내용이 없습니다. 더 짧은 단어로 넣어 보세요.</p>';
+  box._hits = hits; box._q = raw;
+}
+function markIn(root, raw){
+  const q = NORM(raw).n; if (!q) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+  while (w.nextNode()) nodes.push(w.currentNode);
+  nodes.forEach((tn) => { const N = NORM(tn.nodeValue), at = N.n.indexOf(q); if (at < 0 || tn.parentElement.closest('mark,button.toc-chip')) return;
+    const a = N.map[at], b = N.map[at + q.length - 1] + 1, r = document.createRange(); r.setStart(tn, a); r.setEnd(tn, b);
+    const m = document.createElement('mark'); m.className = 'hl'; r.surroundContents(m); });
+}
+let PENDING = null;
+function openHit(o, raw){ closeSearch(); PENDING = { o, raw }; go(o.sec); }
+function applyHit(o, raw){
+  {
+    const view = document.getElementById('view'); let el = null;
+    if (o.kind === 'step') { el = view.querySelectorAll('.step')[o.i]; if (el && el.dataset.key) toggleStep(el, true); }
+    else if (o.kind === 'block') { el = [...view.querySelectorAll(BLOCK_SEL)].filter((x) => !x.closest('.step'))[o.i]; const f = el && el.closest('.faq-item'); if (f && !f.classList.contains('open')) f.querySelector('.faq-q').click(); }
+    if (!el) return;
+    markIn(el, raw);
+    const tgt = (o.part != null && el.querySelector(`.step-det [data-part="${o.part}"]`)) || el;
+    tgt.scrollIntoView({ block: 'center' }); flash(tgt);
+  }
+}
+function openSearch(){ const s = document.getElementById('search'); s.hidden = false; closeDrawer(); const i = document.getElementById('sInput'); i.focus(); i.select(); doSearch(i.value); }
+function closeSearch(){ document.getElementById('search').hidden = true; }
 function closeModal(){ document.getElementById('modal').hidden = true; }
 function closeDrawer(){ document.getElementById('drawer').hidden = true; }
 document.addEventListener('click', (e) => {
   const g = e.target.closest('[data-go]'); if (g) { go(g.dataset.go); return; }
-  const d = e.target.closest('[data-detail]'); if (d) { openDetail(d.dataset.detail); return; }
+  const h = e.target.closest('[data-hit]'); if (h) { const box = document.getElementById('sResults'); openHit(box._hits[+h.dataset.hit], box._q); return; }
+  if (e.target.closest('[data-open-search]')) { openSearch(); return; }
+  if (e.target.closest('[data-close-search]')) { closeSearch(); return; }
+  const fold = e.target.closest('[data-fold]'); if (fold) { const st = fold.closest('.step'); toggleStep(st, false); st.scrollIntoView({ block: 'nearest' }); return; }
+  const d = e.target.closest('[data-detail]'); if (d) { const st = d.closest('.step[data-key]'); if (st) { const part = d.dataset.part; toggleStep(st, part != null ? true : undefined, part != null ? +part : null); } else openDetail(d.dataset.detail); return; }
   const z = e.target.closest('[data-zoom]'); if (z) { openModal(`<h3 id="mTitle">${z.dataset.cap}</h3><img class="zoom-img" src="${IMG[z.dataset.zoom]}" alt="${z.dataset.cap}">`, z.dataset.zoom.startsWith('w-')); return; }
   if (e.target.closest('[data-close-modal]')) { closeModal(); return; }
   if (e.target.closest('[data-close-drawer]')) { closeDrawer(); return; }
@@ -753,7 +903,12 @@ document.addEventListener('click', (e) => {
   const q = e.target.closest('.faq-q');
   if (q) { const it = q.parentElement, open = !it.classList.contains('open'); it.classList.toggle('open', open); it.querySelector('.faq-a').hidden = !open; q.querySelector('i').textContent = open ? '−' : '+'; q.setAttribute('aria-expanded', open); }
 });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeDrawer(); } });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeModal(); closeDrawer(); closeSearch(); }
+  if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); openSearch(); }
+});
+document.getElementById('sInput').addEventListener('input', (e) => doSearch(e.target.value));
+document.getElementById('sInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { const f = document.querySelector('#sResults .s-hit'); if (f) f.click(); } });
 window.addEventListener('hashchange', () => { render(); window.scrollTo({ top: 0 }); });
 render();
 </script>
