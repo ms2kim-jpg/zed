@@ -363,7 +363,10 @@ body::before{background:#fff}
 <style>
 /* ===== 단계 카드 그 자리 펼치기 · 검색 ===== */
 .step{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
-.step.open{border-color:#C9CEF6;box-shadow:0 8px 22px rgba(79,91,213,.10)}
+.step.open{background:#EEF0FD;border-color:#C9CEF6;box-shadow:0 8px 22px rgba(79,91,213,.12)}
+.step.open .step-det{border-top-color:#C9CEF6}
+.step.open .step-det .m-sec{background:#fff;border:1px solid #DDE1FA}
+.step.open .toc-chip:not(.on){background:#fff}
 .step-toc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .toc-chip::after{content:" ▾";font-size:10px;opacity:.6}
 .two{grid-template-columns:minmax(0,1fr)!important}
